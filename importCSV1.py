@@ -48,7 +48,8 @@ def importer(file_name):
             break
         record = build_record(row1)
         #r = record('R',100,'Chili')
-    print(record)
+    return record
+
 
 def build_record(row1):
     #this will create an arbitrary namedtuple(struct) based on the first line of the csv
@@ -57,6 +58,7 @@ def build_record(row1):
     l = ''
     for col in row1:
         #TODO: MustRemoveWhiteSpaceInEachCol because the declaration of namedTuple thinks that each individual word is a tuple.. gonna settle on them being separated by commas for the declaration
+        col = removeWhitespace(col)
         if l == '':
             l = col
         else:
@@ -64,12 +66,19 @@ def build_record(row1):
     print(l)
     record = namedtuple('record',l)
     return record 
-    
+
+
+def removeWhitespace(string):
+    return ''.join(string.split())
+
+
 def create_grid():
     return 0
+
+
     
 #if __name__ == "__main__":
 def main():
     fn = 'MPCI.csv'
-    importer(fn)
-    
+    r = importer(fn)
+    print(r)
