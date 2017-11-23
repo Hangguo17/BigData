@@ -8,8 +8,10 @@ import csv
 # tuple > dict because immutable and clean
 #namedtuple data can be accessed by indexing: tR[0] OR by attribute name: tR.name
 
-
-
+#TODO: WILL NOT BE USING NAMED TUPLE AS THE FORMAT CAN'T BE RETURNED FROM A FUNCTION
+# &&& NAMEDTUPLES CAN'T HAVE DYNAMICALLY UPDATED ELEMENTS
+#WILL INSTEAD USE A LISTLIST OR NESTDLIST
+#MUST UPDATE IMPORTER AND RECORD BUILDER F(X)'s 
 
 ######TESTER CODE#######
 TestRecord = namedtuple('TestRecord', ['name', 'age', 'ID','other'])
@@ -39,7 +41,6 @@ def import_print():
 ########EXECUTED CODE############      
 #importer is the container function for the rest of the smaller functions that import and parse the data
 def importer(file_name):
-    l = []
     with open(file_name, 'r') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|') #gets the reader of rows from the csv
         for row in reader: #returns only the first row of the csv
@@ -52,6 +53,7 @@ def importer(file_name):
 def build_record(row1):
     #this will create an arbitrary namedtuple(struct) based on the first line of the csv
     #can return an arbitrary namedtuple structure
+    #the named tuple has to be a global
     l = ''
     for col in row1:
         col = removeWhitespace(col)
@@ -67,14 +69,32 @@ def build_record(row1):
 def removeWhitespace(string):
     return ''.join(string.split())
 
-
-def create_grid():
+def numRows(fn):
     return 0
+
+def create_grid(r):
+    x = 0
+    grid = []
+    grid.append(r)
+    while(x < 10):
+        row = record()
+        for i in r:
+            row[i] = "myNameIsJeff"
+        x = x+1
+        
+    return 0
+
+
+
+
+
+
 
 
     
 #if __name__ == "__main__":
 def main():
-    fn = 'MPCI.csv'
-    r = importer(fn)
-    print(r)
+    file_name = 'CDHC.csv'
+    r = importer(file_name)
+    bbb[0] = 66    
+    print(bbb)
