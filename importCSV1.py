@@ -4,21 +4,16 @@
 from collections import namedtuple
 import csv
 
-#will be using a namedTuple as an object to hold each line of the csv we read in
-# tuple > dict because immutable and clean
-#namedtuple data can be accessed by indexing: tR[0] OR by attribute name: tR.name
 
-#TODO: WILL NOT BE USING NAMED TUPLE AS THE FORMAT CAN'T BE RETURNED FROM A FUNCTION
+#WILL NOT BE USING NAMED TUPLE AS THE FORMAT CAN'T BE RETURNED FROM A FUNCTION
 # &&& NAMEDTUPLES CAN'T HAVE DYNAMICALLY UPDATED ELEMENTS
 #WILL INSTEAD USE A LISTLIST OR NESTDLIST
 #MUST UPDATE IMPORTER AND RECORD BUILDER F(X)'s 
 
 ######TESTER CODE#######
 TestRecord = namedtuple('TestRecord', ['name', 'age', 'ID','other'])
-tR = TestRecord("Jerdon",22,1234,"I like long walks on the beach and pina coladas")
+tR = TestRecord("Jerdon",22,1234,"test string")
 
-def testNamedTuple(tR):
-    return 0
     
 
 def import_print():
@@ -38,7 +33,9 @@ def import_print():
 
 
 
-########EXECUTED CODE############      
+########EXECUTED CODE############
+
+        
 #importer is the container function for the rest of the smaller functions that import and parse the data
 def importer(file_name):
     with open(file_name, 'r') as csvfile:
@@ -85,7 +82,7 @@ def print_grid(num_rows, grid):
         x = x+1
 
 
-
+#####ASSOCIATION RULE CALCULATIONS#####
 
 
     
