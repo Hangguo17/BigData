@@ -46,46 +46,43 @@ def importer(file_name):
         for row in reader: #returns only the first row of the csv
             row1 = row
             break
-        record = build_record(row1)
-    return record
+        record = build_record2(row1)
+        grid = build_grid(reader)
+        print_grid(100,grid)
+    return record 
 
-
-def build_record(row1):
-    #this will create an arbitrary namedtuple(struct) based on the first line of the csv
-    #can return an arbitrary namedtuple structure
-    #the named tuple has to be a global
-    l = ''
+def build_record2(row1):
+    record = []
     for col in row1:
         col = removeWhitespace(col)
-        if l == '':
-            l = col
-        else:
-            l = l + ', ' + col
-    print(l)
-    record = namedtuple('record',l)
-    return record 
+        record.append(col)
+    return record
 
 
 def removeWhitespace(string):
     return ''.join(string.split())
 
-def numRows(fn):
-    return 0
+def numRows(reader):
+    ctr = 0
+    for row in reader:
+        ctr = ctr+1
+    return ctr
 
-def create_grid(r):
+def build_grid(reader):
     x = 0
     grid = []
-    grid.append(r)
-    while(x < 10):
-        row = record()
-        for i in r:
-            row[i] = "myNameIsJeff"
+    for row in reader:
+        grid.append(row)
         x = x+1
-        
-    return 0
+    return grid
 
-
-
+def print_grid(num_rows, grid):
+    x = 0
+    for r in grid:
+        print(r[1])
+        if(x >= num_rows):
+            break
+        x = x+1
 
 
 
@@ -96,5 +93,4 @@ def create_grid(r):
 def main():
     file_name = 'CDHC.csv'
     r = importer(file_name)
-    bbb[0] = 66    
-    print(bbb)
+    
