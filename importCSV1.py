@@ -140,7 +140,23 @@ def get_column_num(record): #gets column number based on name provided by user
     return 0
     
 
-
+def get_options():
+    print("What do you want to calculate?")
+    print("1 for Support, 2 for Confidence, 3 for Lift, 4 to exit")
+    print("Enter choice here and return: ")
+    option = input()
+    if(option == ''):
+        return 0
+    if(option == '1'):
+        return 1
+    if(option == '2'):
+        return 2
+    if(option == '3'):
+        return 3
+    if(option == '4'):
+        return 4
+    else:
+        return -1
 
 
 
@@ -215,6 +231,11 @@ def SingleSupportOut(grid, record, numRows): #creates a outdoc containing the su
 def main():
     usrV = get_input()#usrV is returned user values of file_name, min support, and min confidence at indexes 0,1,2 respectively 
     grnTup = importer(usrV[0]) #grnTup is a tuple that contains the grid, record, and numRow at indexes 0,1,and 2 respectively
-    SingleSupportOut(grnTup[0],grnTup[1],grnTup[2])
+    #SingleSupportOut(grnTup[0],grnTup[1],grnTup[2])
+    quitter = False
+    while(quitter == False):
+        opt = get_options()
+        if(opt == 4):
+            quitter = True
    
     
