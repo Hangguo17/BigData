@@ -4,7 +4,7 @@
 from collections import namedtuple
 from collections import Counter
 import csv
-import os.path
+import os
 
 
 
@@ -155,9 +155,34 @@ def get_options():
         return 3
     if(option == '4'):
         return 4
+    if(option == "Test"):
+        cwd = os.getcwd()
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        print(dir_path)
+        try: os.makedirs(dir_path+'\TESTDIR')   #I MADE A FOLDER
+        except OSError: #IF FOLDER ALREADY EXISTS pass
+            pass
+        svPath = dir_path+'\TESTDIR'
+        flPath = svPath+'\TESTFILE.txt'
+        fileT = open(flPath, 'w')
+        fileT.write('This is a test')
+        fileT.close()
+        #output = open(os.path.join(dir_path, 'TESTDIR'), 'wb')
     else:
         return -1
 
+def get_support_option():
+    looper = True
+    while(looper):
+        print("Enter: 1 for Single Support, 2 for All Support")
+        opt = input()
+        if(opt == ''):
+            return 0
+        if(opt == '1'):
+            return 1
+        if(opt == '2'):
+            return 2
+        
 
 
 
@@ -224,18 +249,68 @@ def SingleSupportOut(grid, record, numRows): #creates a outdoc containing the su
         file.write(dts+"\n")
     file.close()
     
+def AllSupportOut(grid,record,numRows):
+    rNum = 0
+      # this will be a list of tuples: each tuple will contain a state and the number of times it was refereced in the column
+    cwd = os.getcwd()
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    #print(dir_path)
+    try: os.makedirs(dir_path+'\AllSupport')   #I MADE A FOLDER
+    except OSError: #IF FOLDER ALREADY EXISTS pass
+        pass
+    svPath = dir_path+'\AllSupport/'
+    for r in record:
+        L = []
+        x = 0
+        for g in grid:
+            L.append(g[rNum])
+            if(x >= numRows):
+                break
+            x = x+1
+        counter = Counter(L)
+        fileName = str(record[rNum])+"SingleSupport.txt"
+        flPath = svPath+fileName
+        file = open(flPath, 'w')
+        for i in counter:
+            sup = strictSupport(counter[i],numRows)
+            dts = dictToString(i,sup)
+            file.write(dts+"\n")
+        file.close()
+        rNum = rNum+1
+    print('')
+    print("Created Support Files For Each Data Type")
+    print('')
+    
 
+
+########## Option Controller ###########
+
+def optCont(opt, grnTup):
+    if(opt == 1): #Support chosen
+        sopt = get_support_option()
+        if(sopt == 1):SingleSupportOut(grnTup[0],grnTup[1],grnTup[2])
+        elif(sopt == 2 or sopt == 0): AllSupportOut(grnTup[0],grnTup[1],grnTup[2])
+    if(opt == 2): #Confidence chosen
+        print("Confidence Coming Soon")
+    if(opt == 3):
+        print("Lift Coming Soon")
+    if(opt == 0):
+        printCol(grnTup[0],grnTup[1],grnTup[2])
 
 ############ Main Function ############    
-#if __name__ == "__main__":
+
 def main():
     usrV = get_input()#usrV is returned user values of file_name, min support, and min confidence at indexes 0,1,2 respectively 
     grnTup = importer(usrV[0]) #grnTup is a tuple that contains the grid, record, and numRow at indexes 0,1,and 2 respectively
-    #SingleSupportOut(grnTup[0],grnTup[1],grnTup[2])
     quitter = False
     while(quitter == False):
         opt = get_options()
         if(opt == 4):
             quitter = True
+        elif(opt == -1):
+            print('try again')
+        else: optCont(opt, grnTup)
    
     
+if __name__ == '__main__':
+    main()
