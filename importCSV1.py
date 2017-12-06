@@ -198,6 +198,74 @@ def strictConfidence(numRule, numItem):
     return numRule/numItem
 
 
+def allRules(grid, record, numRows):
+    #ALLRULES IS RETURNING SETS OF EXTREMELY SIMILAR DATA, I THINK IT IS HIGHLY UNLIKELY THAT MORE THAN A FEW ROWS WILL HAVE THE SAME NUMBER OF RULES... THE COUNTING MUST BE OFF SOMEHOW
+    Rules = []
+    rCounter = 0
+    numRecords = 0
+    for r in record:
+        numRecords = numRecords + 1
+    while(rCounter < numRecords - 1):
+        R1 = record[rCounter]
+        rCounter2 = rCounter + 1
+        while(rCounter2 < numRecords):
+            R2 = record[rCounter2]
+            ruleCtr = 0
+            for row in grid:
+                if((row[rCounter] == '1')and(row[rCounter2] == '1')): #MISPLACED BRACKET lol
+                   ruleCtr = ruleCtr+1
+            Rules.append((R1,R2,ruleCtr))
+            rCounter2 = rCounter2 + 1
+        rCounter = rCounter + 1
+    #Total 630 Rules
+    #Rules = msort(Rules)
+    Rules = mergeSortRules(Rules,0,(len(Rules)-1))
+    return Rules
+
+
+
+
+
+
+def mergeSortRules(Rules, low, high):
+    if(low == high):
+        return Rules
+    if(low == high - 1):
+        if(Rules[low][2] > Rules[high][2]): #must be switched
+            temp = Rules[low]
+            Rules[low] = Rules[high]
+            Rules[high] = temp
+        return Rules
+    mid = 0
+    if(low < high):
+        mid = int((low+high)/2) #gotta cast it to an int so its a whole number that can be used to access data in a list
+        Rules = mergeSortRules(Rules, low, mid)
+        Rules = mergeSortRules(Rules, mid+1, high)
+        Rules = mergeRules(Rules, low, mid, high)
+    return Rules
+
+def mergeRules(Rules, low, mid, high): #more than 2 rules per array to be merged
+    l = low
+    m = mid+1
+    tempL = []
+    while(l <= mid and m <= high):
+        if(Rules[l][2] < Rules[m][2]): #insert to temp in current order
+            tempL.append(Rules[l])
+            l = l+1
+        else: # rules either have the same value or the high index is lower
+            tempL.append(Rules[m])
+            m = m+1
+    while(l <= mid): #insert remaining low values if any
+        tempL.append(Rules[l])
+        l = l+1
+    while(m <= high): #insert remaining high values if any
+        tempL.append(Rules[m])
+        m = m+1
+    l = low
+    for t in tempL:
+        Rules[l] = t
+        l = l+1
+    return Rules
 
 
 def calcSupport(itemset, numRows):
@@ -291,8 +359,11 @@ def optCont(opt, grnTup):
         if(sopt == 1):SingleSupportOut(grnTup[0],grnTup[1],grnTup[2])
         elif(sopt == 2 or sopt == 0): AllSupportOut(grnTup[0],grnTup[1],grnTup[2])
     if(opt == 2): #Confidence chosen
-        print("Confidence Coming Soon")
-    if(opt == 3):
+        Rules = allRules(grnTup[0],grnTup[1],grnTup[2])
+        ctr = 0
+        for r in Rules: print(r)
+        
+    if(opt == 3): #Lift Chosen
         print("Lift Coming Soon")
     if(opt == 0):
         printCol(grnTup[0],grnTup[1],grnTup[2])
