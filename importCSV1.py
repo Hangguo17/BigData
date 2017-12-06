@@ -296,6 +296,9 @@ def lift():
 
 def dictToString(key, value):
     return str(key)+':'+str(value)
+
+def ruleToString(rule):
+    return rule[0] + ', ' + rule[1]+ ', ' + str(rule[2])
     
 
 def SingleSupportOut(grid, record, numRows): #creates a outdoc containing the support values of individual items in a column
@@ -349,7 +352,22 @@ def AllSupportOut(grid,record,numRows):
     print("Created Support Files For Each Data Type")
     print('')
     
-
+def RulesOut(Rules):
+    cwd = os.getcwd()
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    try: os.makedirs(dir_path+'\AllRules')
+    except OSError: #IF FOLDER ALREADY EXISTS pass
+        pass
+    svPath = dir_path+'\AllRules/'
+    fileName = "Rules.txt"
+    flPath = svPath + fileName
+    file = open(flPath, 'w')
+    r = len(Rules)-1
+    while(r > 0):
+        file.write(ruleToString(Rules[r])+"\n")
+        r = r-1
+    file.close()
+    
 
 ########## Option Controller ###########
 
@@ -360,9 +378,7 @@ def optCont(opt, grnTup):
         elif(sopt == 2 or sopt == 0): AllSupportOut(grnTup[0],grnTup[1],grnTup[2])
     if(opt == 2): #Confidence chosen
         Rules = allRules(grnTup[0],grnTup[1],grnTup[2])
-        ctr = 0
-        for r in Rules: print(r)
-        
+        RulesOut(Rules)
     if(opt == 3): #Lift Chosen
         print("Lift Coming Soon")
     if(opt == 0):
