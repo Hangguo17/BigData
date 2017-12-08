@@ -156,6 +156,8 @@ def get_options():
         return 3
     if(option == '4'):
         return 4
+    if(option == "Print"):
+        return 6
     if(option == "Test"):
         cwd = os.getcwd()
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -198,8 +200,20 @@ def strictSupport(numItems, numRows):
 def strictConfidence(numRule, numItem):
     return numRule/numItem
 
+def singleCount(grid, record, numRows): #Same purpose as allRules but only for one variable each not combinatons
+    Rools = []
+    recordCtr = 0
+    for r in record:
+        roolCtr = 0
+        for row in grid:
+            if(row[recordCtr] == '1'):
+                roolCtr += 1
+        Rools.append((r,roolCtr))
+        recordCtr = recordCtr + 1
+    return Rools
+    
 
-def allRules(grid, record, numRows):
+def allRules(grid, record, numRows): #only rules with two variables
     #ALLRULES IS RETURNING SETS OF EXTREMELY SIMILAR DATA, I THINK IT IS HIGHLY UNLIKELY THAT MORE THAN A FEW ROWS WILL HAVE THE SAME NUMBER OF RULES... THE COUNTING MUST BE OFF SOMEHOW
     Rules = []
     rCounter = 0
@@ -268,6 +282,23 @@ def mergeRules(Rules, low, mid, high): #more than 2 rules per array to be merged
         l = l+1
     return Rules
 
+def allConfidence(Rules, Singles):
+    Confidence = []
+    for r in Rules:
+        for s in Singles: #1000's of local singles in your area waiting to meet you
+            if(r[0] == s[0]):
+                if(int(s[1]) != 0):
+                    Confidence.append((r[0],r[1],(int(r[2])/int(s[1]))))
+                    #print('Confidence of',r[0],'->',r[1],'=', "%.4f" %(int(r[2])/int(s[1])))
+                break
+        for s in Singles: #for confidence of rules based on the Y->X not only X->Y
+            if(r[1] == s[0]):
+                if(int(s[1]) != 0):
+                    Confidence.append((r[1],r[0],(int(r[2])/int(s[1]))))
+                    #print('Confidence of',r[0],'->',r[1],'=', "%.4f" %(int(r[2])/int(s[1])))
+                break
+    return Confidence
+
 
 def calcSupport(itemset, numRows):
     x = 0
@@ -322,6 +353,7 @@ def SingleSupportOut(grid, record, numRows): #creates a outdoc containing the su
     file.close()
     
 def AllSupportOut(grid,record,numRows):
+    support = []
     rNum = 0
       # this will be a list of tuples: each tuple will contain a state and the number of times it was refereced in the column
     cwd = os.getcwd()
@@ -346,13 +378,17 @@ def AllSupportOut(grid,record,numRows):
         for i in counter:
             sup = strictSupport(counter[i],numRows)
             dts = dictToString(i,sup)
+            if(str(i) == '1'):
+                support.append((record[rNum],i,sup))
             file.write(dts+"\n")
         file.close()
         rNum = rNum+1
     print('')
     print("Created Support Files For Each Data Type")
     print('')
-    
+    return support
+
+
 def RulesOut(Rules):
     cwd = os.getcwd()
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -368,22 +404,57 @@ def RulesOut(Rules):
         file.write(ruleToString(Rules[r])+"\n")
         r = r-1
     file.close()
+
+def ConfidenceOut(Rules, Singles):
+    Confidence = allConfidence(Rules, Singles)
+    cwd = os.getcwd()
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    try: os.makedirs(dir_path+'\AllConfidence')
+    except OSError: #IF FOLDER ALREADY EXISTS pass
+        pass
+    svPath = dir_path+'\AllConfidence/'
+    fileName = "Confidence.txt"
+    flPath = svPath + fileName
+    file = open(flPath, 'w')
+    r = len(Confidence)-1
+    while(r > 0):
+        file.write(ruleToString(Confidence[r])+"\n")
+        r = r-1
+    file.close()
+    return Confidence
     
 
 ########## Option Controller ###########
 
-def optCont(opt, grnTup):
+def optCont(opt, grnTup, srsclTup):
+    #Container for all values incase they need to be used elsewhere
     if(opt == 1): #Support chosen
         sopt = get_support_option()
         if(sopt == 1):SingleSupportOut(grnTup[0],grnTup[1],grnTup[2])
-        elif(sopt == 2 or sopt == 0): AllSupportOut(grnTup[0],grnTup[1],grnTup[2])
+        elif(sopt == 2 or sopt == 0):
+            support = AllSupportOut(grnTup[0],grnTup[1],grnTup[2])
+            if(len(srsclTup) > 0):
+                srsclTup[0] = support
+            else: srsclTup.append(support)
     if(opt == 2): #Confidence chosen
-        Rules = allRules(grnTup[0],grnTup[1],grnTup[2])
-        RulesOut(Rules)
+        rules = allRules(grnTup[0],grnTup[1],grnTup[2])
+        singles = singleCount(grnTup[0],grnTup[1],grnTup[2])
+        RulesOut(rules)
+        confidence = ConfidenceOut(rules, singles)
+        if(len(srsclTup) >= 3):
+            srsclTup[1] = rules
+            srsclTup[2] = singles
+            srsclTup[3] = confidence
+        else:
+            srsclTup.append(rules)
+            srsclTup.append(singles)
+            srsclTup.append(confidence)
     if(opt == 3): #Lift Chosen
         print("Lift Coming Soon")
-    if(opt == 0):
-        printCol(grnTup[0],grnTup[1],grnTup[2])
+    if(opt == 6):
+        for item in srsclTup:
+            print(item)
+    return srsclTup
 
 ############ Main Function ############    
 
@@ -391,13 +462,14 @@ def main():
     usrV = get_input()#usrV is returned user values of file_name, min support, and min confidence at indexes 0,1,2 respectively 
     grnTup = importer(usrV[0]) #grnTup is a tuple that contains the grid, record, and numRow at indexes 0,1,and 2 respectively
     quitter = False
+    srsclTup = []
     while(quitter == False):
         opt = get_options()
         if(opt == 4):
             quitter = True
         elif(opt == -1):
             print('try again')
-        else: optCont(opt, grnTup)
+        else: srsclTup = optCont(opt, grnTup, srsclTup)
    
     
 if __name__ == '__main__':
