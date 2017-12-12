@@ -108,7 +108,7 @@ def get_input():
     print("Enter File Name: ")
     file_name = input()
     if(file_name == ''):
-        file_name = 'CDHCB.csv'
+        file_name = 'CDHCB2.csv'
     print("Enter minimum Support Threshold (return for default value): ")
     sup = input()
     if(sup == ''):
